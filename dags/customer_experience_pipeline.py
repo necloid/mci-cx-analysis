@@ -20,7 +20,7 @@ with DAG(
 
     download_raw_archive = BashOperator(
         task_id='download_raw_archive',
-        bash_command='python /opt/airflow/dags/scripts/download_archive.py'
+        bash_command='python /opt/airflow/dags/scripts/download_raw_archive.py'
     )
 
     extract_to_data_lake = BashOperator(
