@@ -45,9 +45,8 @@ def download_dataset():
 
     # pick latest file alphabetically
     file_id, file_name = sorted(files, key=lambda x: x[1], reverse=True)[0]
-
     destination_path = os.path.join(DESTINATION_DIR, file_name)
-
+   
     logger.info(f"Downloading {file_name}...")
 
     try:
@@ -56,18 +55,14 @@ def download_dataset():
             destination_path,
             quiet=False
         )
-
         if not os.path.exists(destination_path) or os.path.getsize(destination_path) == 0:
             raise Exception("Downloaded file is empty.")
-
         logger.info(f"Download completed: {destination_path}")
 
     except Exception as e:
         logger.error(f"Download failed: {e}")
-
         if os.path.exists(destination_path):
             os.remove(destination_path)
-
         sys.exit(1)
 
 if __name__ == "__main__":
