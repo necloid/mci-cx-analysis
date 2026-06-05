@@ -28,4 +28,9 @@ with DAG(
         bash_command='python /opt/airflow/dags/scripts/extract_to_data_lake.py'
     )
 
-    download_raw_archive >> extract_to_data_lake
+    load_data_to_clickhouse = BashOperator(
+        task_id='load_data_to_clickhouse',
+        bash_command='python /opt/airflow/dags/scripts/load_data.py'
+    )
+
+    download_raw_archive >> extract_to_data_lake >> load_data_to_clickhouse
