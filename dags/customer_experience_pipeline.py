@@ -32,5 +32,10 @@ with DAG(
         task_id='load_data_to_clickhouse',
         bash_command='python /opt/airflow/dags/scripts/load_data.py'
     )
+    
+    transform_data = BashOperator(
+        task_id='transform_data',
+        bash_command='python /opt/airflow/dags/scripts/transform_data.py'
+    )
 
-    download_raw_archive >> extract_to_data_lake >> load_data_to_clickhouse
+    download_raw_archive >> extract_to_data_lake >> load_data_to_clickhouse >> transform_data
