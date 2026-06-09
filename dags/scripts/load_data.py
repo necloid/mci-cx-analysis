@@ -153,7 +153,7 @@ CSV_TO_TABLE_MAPPING = {
 }
 
 def load_staging_layer():
-    logger.info("🔌 Connecting to the ClickHouse database cluster...")
+    logger.info("Connecting to the ClickHouse database cluster...")
     try:
         client = clickhouse_connect.get_client(
             host=CLICKHOUSE_HOST,
@@ -162,7 +162,7 @@ def load_staging_layer():
             password=CLICKHOUSE_PASSWORD
         )
     except Exception as e:
-        logger.error(f"❌ Failed to connect to ClickHouse: {e}")
+        logger.error(f"Failed to connect to ClickHouse: {e}")
         sys.exit(1)
 
     logger.info("🛠️ Preparing the 'staging' database namespace...")
@@ -174,32 +174,32 @@ def load_staging_layer():
         full_table_name = f"staging.{table_name}"
         
         if not os.path.exists(csv_path):
-            logger.warning(f"⚠️ Data file {csv_file} was not found in {DATA_LAKE_DIR}. Skipping this table.")
+            logger.warning(f"Data file {csv_file} was not found in {DATA_LAKE_DIR}. Skipping this table.")
             continue
 
         # create the table DDL for this specific table if needed
-        logger.info(f"🏗️ Creating table (if does not exist): {full_table_name}")
+        logger.info(f"Creating table (if does not exist): {full_table_name}")
         client.command(STAGING_TABLES_DDL[f"staging_{table_name}"])
 
         # truncate old data to make each run idempotent
-        logger.info(f"🧹 Clearing old data in {full_table_name}...")
+        logger.info(f"Clearing old data in {full_table_name}...")
         client.command(f"TRUNCATE TABLE {full_table_name};")
 
         # load CSV into df and insert into clickhouse
-        logger.info(f"📥 Loading data from {csv_file} into ClickHouse...")
+        logger.info(f"Loading data from {csv_file} into ClickHouse...")
         try:
             df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
             client.insert_df(table=table_name, df=df, database="staging")
 
             # post-ingestion integrity audit: count the number of rows loaded
             row_count = client.command(f"SELECT count() FROM {full_table_name}")
-            logger.info(f"✅ Successfully loaded {full_table_name}! Total records: {row_count} rows.")
+            logger.info(f"Successfully loaded {full_table_name}! Total records: {row_count} rows.")
 
         except Exception as e:
-            logger.error(f"❌ Failed to load file {csv_file} into {full_table_name}: {e}")
+            logger.error(f"Failed to load file {csv_file} into {full_table_name}: {e}")
             sys.exit(1)
 
-    logger.info("🏁 Finished! Staging layer populated and ready for the clean layer.")
+    logger.info("Finished! Staging layer populated and ready for the clean layer.")
 
 if __name__ == "__main__":
     load_staging_layer()

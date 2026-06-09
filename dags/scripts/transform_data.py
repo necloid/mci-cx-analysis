@@ -18,7 +18,7 @@ CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "admin")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "rahasia")
 
 def run_silver_transformation_pipeline():
-    logger.info("🔌 Initializing connection to ClickHouse OLAP Cluster...")
+    logger.info("Initializing connection to ClickHouse OLAP Cluster...")
     try:
         client = clickhouse_connect.get_client(
             host=CLICKHOUSE_HOST,
@@ -27,7 +27,7 @@ def run_silver_transformation_pipeline():
             password=CLICKHOUSE_PASSWORD
         )
     except Exception as e:
-        logger.error(f"❌ Failed to connect to ClickHouse Server: {e}")
+        logger.error(f"Failed to connect to ClickHouse Server: {e}")
         sys.exit(1)
 
     logger.info("🛠️  Creating core database namespace if not exists...")
@@ -260,27 +260,27 @@ def run_silver_transformation_pipeline():
 
     # Loop untuk mengeksekusi migrasi data per tabel
     total_tables = len(SILVER_TABLES_DDL)
-    logger.info(f"🚀 Found {total_tables} target core models to compile. Processing data...")
+    logger.info(f"Found {total_tables} target core models to compile. Processing data...")
 
     for idx, (table_name, ddl_query) in enumerate(SILVER_TABLES_DDL.items(), 1):
-        logger.info(f" [{idx}/{total_tables}] Compiling architecture for: {table_name}")
+        logger.info(f"[{idx}/{total_tables}] Compiling architecture for: {table_name}")
         
         client.command(ddl_query)
 
-        logger.info(f" 🧹 Wiping target records in {table_name} to guarantee idempotency...")
+        logger.info(f"Wiping target records in {table_name} to guarantee idempotency...")
         client.command(f"TRUNCATE TABLE {table_name};")
 
-        logger.info(f" ✨ Ingesting high-performance typed records into {table_name}...")
+        logger.info(f"Ingesting high-performance typed records into {table_name}...")
         try:
             client.command(SILVER_TRANSFORM_QUERIES[table_name])
             
             row_count = client.command(f"SELECT count() FROM {table_name}")
-            logger.info(f" ✅ Materialization success! {table_name} holds {row_count} clean rows.")
+            logger.info(f"Materialization success! {table_name} holds {row_count} clean rows.")
         except Exception as e:
-            logger.error(f" ❌ Critical error executing Core Transformation on {table_name}: {e}")
+            logger.error(f"Critical error executing Core Transformation on {table_name}: {e}")
             sys.exit(1)
 
-    logger.info("🎉 SUCCESS: Core Layer has been successfully deployed!")
+    logger.info("SUCCESS: Core Layer has been successfully deployed!")
 
 if __name__ == "__main__":
     run_silver_transformation_pipeline()
