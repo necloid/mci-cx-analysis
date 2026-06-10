@@ -24,7 +24,7 @@ def download_dataset():
         response = requests.get(folder_url, timeout=30)
         response.raise_for_status()
     except requests.RequestException as e:
-        logger.error(f"Failed to access Google Drive folder: {e}")
+        logger.error(f"❌ Failed to access Google Drive folder: {e}")
         sys.exit(1)
 
     entries = re.findall(
@@ -40,7 +40,7 @@ def download_dataset():
     ]
 
     if not files:
-        logger.error("No matching Funnel_*.zip files found.")
+        logger.error("❌ No matching Funnel_*.zip files found.")
         sys.exit(1)
 
     # pick latest file alphabetically
@@ -57,10 +57,10 @@ def download_dataset():
         )
         if not os.path.exists(destination_path) or os.path.getsize(destination_path) == 0:
             raise Exception("Downloaded file is empty.")
-        logger.info(f"Download completed: {destination_path}")
+        logger.info(f"✅ Download completed: {destination_path}")
 
     except Exception as e:
-        logger.error(f"Download failed: {e}")
+        logger.error(f"❌ Download failed: {e}")
         if os.path.exists(destination_path):
             os.remove(destination_path)
         sys.exit(1)

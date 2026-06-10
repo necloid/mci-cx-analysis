@@ -12,10 +12,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST", "clickhouse-server")
+CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
 CLICKHOUSE_PORT = int(os.getenv("CLICKHOUSE_PORT", 8123))
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "admin")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "rahasia")
+CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
+CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
 
 def run_silver_transformation_pipeline():
     logger.info("🔌 Initializing connection to ClickHouse OLAP Cluster...")
@@ -127,7 +127,7 @@ def run_silver_transformation_pipeline():
                 mql_id String,
                 first_contact_date Nullable(DateTime),
                 landing_page_id String,
-                origin Nullable(LowCardinality(String))
+                origin LowCardinality(Nullable(String))
             ) ENGINE = MergeTree() ORDER BY mql_id;
         """,
         "core.closed_deals": """

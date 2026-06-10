@@ -13,11 +13,10 @@ logger = logging.getLogger(__name__)
 
 DATA_LAKE_DIR = "/opt/airflow/data_lake"
 
-# clickhouse connection config
-CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST", "clickhouse-server")
+CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST")
 CLICKHOUSE_PORT = int(os.getenv("CLICKHOUSE_PORT", 8123))
-CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "admin")
-CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "rahasia")
+CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER")
+CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD")
 
 # DDL for staging tables
 STAGING_TABLES_DDL = {

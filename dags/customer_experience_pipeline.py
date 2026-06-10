@@ -18,24 +18,29 @@ with DAG(
     description='Customer Experience Ingestion & Analysis Pipeline'
 ) as dag:
 
-    download_raw_archive = BashOperator(
-        task_id='download_raw_archive',
-        bash_command='python /opt/airflow/dags/scripts/download_raw_archive.py'
+    ingest_download_archive = BashOperator(
+        task_id='01_ingest_download_archive',
+        bash_command='python /opt/airflow/dags/scripts/01_ingest_download_archive.py'
     )
 
-    extract_to_data_lake = BashOperator(
-        task_id='extract_to_data_lake',
-        bash_command='python /opt/airflow/dags/scripts/extract_to_data_lake.py'
+    ingest_extract_lake = BashOperator(
+        task_id='02_ingest_extract_lake',
+        bash_command='python /opt/airflow/dags/scripts/02_ingest_extract_lake.py'
     )
 
-    load_data_to_clickhouse = BashOperator(
-        task_id='load_data_to_clickhouse',
-        bash_command='python /opt/airflow/dags/scripts/load_data.py'
+    load_to_staging = BashOperator(
+        task_id='03_load_to_staging',
+        bash_command='python /opt/airflow/dags/scripts/03_load_to_staging.py'
     )
     
-    transform_data = BashOperator(
-        task_id='transform_data',
-        bash_command='python /opt/airflow/dags/scripts/transform_data.py'
+    transform_to_core = BashOperator(
+        task_id='04_transform_to_core',
+        bash_command='python /opt/airflow/dags/scripts/04_transform_to_core.py'
     )
 
-    download_raw_archive >> extract_to_data_lake >> load_data_to_clickhouse >> transform_data
+    aggregate_to_analytics = BashOperator(
+        task_id='05_aggregate_to_analytics',
+        bash_command='python /opt/airflow/dags/scripts/05_aggregate_to_analytics.py'
+    )
+
+    ingest_download_archive >> ingest_extract_lake >> load_to_staging >> transform_to_core >> aggregate_to_analytics
