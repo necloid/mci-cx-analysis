@@ -135,22 +135,21 @@ def run_analytics_aggregation_pipeline():
         "analytics.mart_cx_product_and_seller_quality": """
             CREATE TABLE analytics.mart_cx_product_and_seller_quality 
             ENGINE = MergeTree() 
-            ORDER BY (seller_id, order_id, order_item_id) AS
+            ORDER BY (seller_id, order_id) AS
             SELECT 
-                oi.order_item_id,
-                oi.order_id,
-                oi.product_id,
-                oi.seller_id,
-                r.review_score,
+                oi.order_id        AS order_id,
+                oi.product_id      AS product_id,
+                oi.seller_id       AS seller_id,
+                r.review_score     AS review_score,
                 t.product_category_name_english AS product_category,
-                p.product_photos_qty AS product_photos_qty,
-                p.product_weight_g AS product_weight_g,
-                p.product_description_lenght AS product_description_length,
+                p.product_photos_qty            AS product_photos_qty,
+                p.product_weight_g              AS product_weight_g,
+                p.product_description_lenght    AS product_description_length,
                 
                 -- seller aggregate metrics
-                s_meta.total_seller_orders,
-                s_meta.seller_bayesian_rating,
-                s_meta.seller_late_shipping_rate
+                s_meta.total_seller_orders      AS total_seller_orders,
+                s_meta.seller_bayesian_rating   AS seller_bayesian_rating,
+                s_meta.seller_late_shipping_rate AS seller_late_shipping_rate
             FROM core.order_items oi
             LEFT JOIN core.order_reviews r ON oi.order_id = r.order_id
             LEFT JOIN core.products p ON oi.product_id = p.product_id
