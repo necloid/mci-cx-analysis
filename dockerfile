@@ -2,11 +2,6 @@ FROM apache/airflow:2.9.1-python3.11
 
 USER root
 
-# Install Java untuk Spark
-RUN apt-get update && \
-    apt-get install -y default-jdk-headless && \
-    apt-get clean
-
 USER airflow
 
 COPY requirements.txt /

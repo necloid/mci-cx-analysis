@@ -75,7 +75,7 @@ def run_silver_transformation_pipeline():
                 review_comment_message Nullable(String),
                 review_creation_date DateTime,
                 review_answer_timestamp DateTime
-            ) ENGINE = MergeTree() ORDER BY review_score;
+            ) ENGINE = MergeTree() ORDER BY (order_id, review_id);
         """,
         "core.order_payments": """
             CREATE TABLE IF NOT EXISTS core.order_payments (
@@ -265,6 +265,9 @@ def run_silver_transformation_pipeline():
     for idx, (table_name, ddl_query) in enumerate(SILVER_TABLES_DDL.items(), 1):
         logger.info(f" [{idx}/{total_tables}] Compiling architecture for: {table_name}")
         
+        if table_name == "core.order_reviews":
+            client.command(f"DROP TABLE IF EXISTS {table_name};")
+            
         client.command(ddl_query)
 
         logger.info(f" 🧹 Wiping target records in {table_name} to guarantee idempotency...")

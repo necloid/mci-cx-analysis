@@ -184,11 +184,12 @@ def load_staging_layer():
         logger.info(f"🧹 Clearing old data in {full_table_name}...")
         client.command(f"TRUNCATE TABLE {full_table_name};")
 
-        # load CSV into df and insert into clickhouse
-        logger.info(f"📥 Loading data from {csv_file} into ClickHouse...")
+        # load CSV in chunks and insert into clickhouse to prevent OOM
+        logger.info(f"📥 Loading data from {csv_file} into ClickHouse in chunks...")
         try:
-            df = pd.read_csv(csv_path, dtype=str, keep_default_na=False)
-            client.insert_df(table=table_name, df=df, database="staging")
+            chunk_size = 50000
+            for chunk in pd.read_csv(csv_path, dtype=str, keep_default_na=False, chunksize=chunk_size):
+                client.insert_df(table=table_name, df=chunk, database="staging")
 
             # post-ingestion integrity audit: count the number of rows loaded
             row_count = client.command(f"SELECT count() FROM {full_table_name}")

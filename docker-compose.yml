@@ -62,5 +62,7 @@ services:
     image: metabase/metabase:latest
     ports:
       - "3000:3000"
+    volumes:
+      - ./metabase_data:/metabase.db
     depends_on:
       - clickhouse-server
